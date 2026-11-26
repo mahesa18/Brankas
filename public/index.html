@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Brankas — Password Manager</title>
+<meta name="referrer" content="no-referrer">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="logo.svg">
+<meta name="theme-color" content="#0F1115">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css?v=21">
+</head>
+<body>
+
+<!-- ============ LOCK SCREEN ============ -->
+<section id="lock" class="lock" hidden>
+  <div class="lock-box">
+    <div class="lock-head">
+      <div class="logo big"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4.9" y="4.1" width="14.2" height="13.5" rx="3"/><circle cx="12" cy="10.9" r="3.2"/><path d="M12 10.9l1.9-1.9"/><path d="M7.9 17.6v1.9M16.1 17.6v1.9"/></svg></div>
+      <h1 id="lock-title">Masuk ke Brankas</h1>
+      <p id="lock-sub" class="muted">Masukkan master password. Data didekripsi hanya di perangkat ini.</p>
+    </div>
+    <div class="tabs" id="tabs" role="tablist" aria-label="Masuk atau daftar">
+      <button type="button" role="tab" id="tab-login" aria-selected="true">Masuk</button>
+      <button type="button" role="tab" id="tab-reg" aria-selected="false">Daftar</button>
+    </div>
+    <form id="lock-form" class="card stack">
+      <label for="lu">Username</label>
+      <input id="lu" class="input" required autocomplete="username" autocapitalize="none" spellcheck="false" maxlength="64" placeholder="mis. indra.mahendra" aria-describedby="lu-hint">
+      <p id="lu-hint" class="muted small" style="margin-top:-4px">Huruf kecil, angka, dan . _ @ + - (tanpa spasi). Spasi otomatis jadi titik.</p>
+      <label for="mp">Master password</label>
+      <div class="field">
+        <input id="mp" type="password" class="mono" required minlength="8" autocomplete="current-password">
+        <button type="button" class="icon-btn" data-toggle="mp" aria-label="Tampilkan password"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg></button>
+      </div>
+      <div id="mp2-wrap" class="stack" hidden>
+        <label for="mp2">Ulangi master password</label>
+        <div class="field"><input id="mp2" type="password" class="mono" autocomplete="new-password"></div>
+      </div>
+      <div id="code-wrap" class="stack" hidden>
+        <label for="code">Kode pendaftaran</label>
+        <input id="code" class="input mono" autocomplete="off" spellcheck="false" placeholder="Minta ke admin server">
+      </div>
+      <p id="reg-hint" class="muted small" hidden>Minimal 10 karakter. Master password <b>tidak bisa direset</b> — kalau lupa, isi vault hilang. Simpan backup terenkripsi secara berkala.</p>
+      <div id="ts-box" class="ts-box" hidden></div>
+      <p id="lock-err" class="err" role="alert"></p>
+      <button id="lock-btn" type="submit" class="btn primary block">Masuk</button>
+    </form>
+    <div class="chips-row small muted">
+      <span><i class="dot"></i>Enkripsi end-to-end AES-256-GCM</span>
+      <span><i class="dot"></i>PBKDF2 · 600.000 iterasi</span>
+      <span><i class="dot"></i>Server self-hosted</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ APP ============ -->
+<div id="app" class="app" hidden>
+  <header class="mbar">
+    <button type="button" class="icon-btn" id="menu-open" aria-label="Buka menu" aria-controls="side" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+    <div class="brand"><div class="logo"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4.9" y="4.1" width="14.2" height="13.5" rx="3"/><circle cx="12" cy="10.9" r="3.2"/><path d="M12 10.9l1.9-1.9"/><path d="M7.9 17.6v1.9M16.1 17.6v1.9"/></svg></div><span>Brankas</span></div>
+    <button type="button" class="icon-btn" id="m-lock" aria-label="Kunci vault"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></button>
+  </header>
+  <div class="scrim" id="scrim"></div>
+  <nav class="side" id="side" aria-label="Navigasi utama">
+    <div class="brand">
+      <div class="logo"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4.9" y="4.1" width="14.2" height="13.5" rx="3"/><circle cx="12" cy="10.9" r="3.2"/><path d="M12 10.9l1.9-1.9"/><path d="M7.9 17.6v1.9M16.1 17.6v1.9"/></svg></div>
+      <span>Brankas</span>
+    </div>
+    <div id="nav-items" class="nav-group"></div>
+    <div class="nav-title"><span>Folder</span><button type="button" class="icon-btn sm" id="folder-add" aria-label="Folder baru" title="Folder baru"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button></div>
+    <div id="nav-folders" class="nav-group"></div>
+    <div class="nav-title"><span>Alat</span></div>
+    <div id="nav-tools" class="nav-group"></div>
+    <div class="grow"></div>
+    <button class="nav outline" id="lock-now"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/></svg>Kunci vault</button>
+  </nav>
+
+  <main class="main">
+    <!-- ITEMS (semua jenis) -->
+    <section class="view" id="v-items" hidden>
+      <header class="head">
+        <div class="grow-1">
+          <h1 id="items-title">Semua item</h1>
+          <p class="muted" id="items-sub">Terenkripsi AES-256 di perangkat ini. Hanya kamu yang memegang kuncinya.</p>
+        </div>
+        <label class="search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><span class="sr">Cari item</span><input id="search" type="search" placeholder="Cari…"></label>
+        <div id="folder-acts" class="row-wrap" hidden>
+          <button class="btn" id="folder-rename">Ganti nama</button>
+          <button class="btn danger" id="folder-del">Hapus folder</button>
+        </div>
+        <div class="menu-wrap">
+          <button class="btn primary" id="add-btn" aria-haspopup="menu" aria-expanded="false" aria-controls="add-menu"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Tambah</button>
+          <div class="menu" id="add-menu" role="menu" aria-labelledby="add-btn" hidden></div>
+        </div>
+      </header>
+      <section class="item-grid" id="list" aria-label="Daftar item"></section>
+    </section>
+
+    <!-- GENERATOR -->
+    <section class="view" id="v-generator" hidden>
+      <header class="head"><div><h1>Password Generator</h1><p class="muted">Acak kriptografis dari perangkatmu. Panjang 8–32 karakter.</p></div></header>
+      <div class="panels">
+        <section class="card panel" aria-labelledby="p-gen-out">
+          <header class="panel-head">
+            <span class="panel-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></span>
+            <div><h2 id="p-gen-out">Hasil</h2><p>Password baru dibuat setiap kali pengaturan berubah.</p></div>
+          </header>
+          <div class="panel-body">
+            <div class="gen-out"><output id="gen-pw" class="mono" aria-live="polite"></output></div>
+            <div class="meter-row"><div class="bars" id="gen-bars"><i></i><i></i><i></i><i></i></div><span id="gen-strength" class="small strong"></span></div>
+            <div class="stack len-box">
+              <div class="row-between"><label for="gen-len" class="strong">Panjang</label><span id="gen-len-val" class="mono accent big-num">20</span></div>
+              <input id="gen-len" type="range" min="8" max="32" value="20">
+              <div class="row-between small muted"><span>8</span><span>16</span><span>24</span><span>32</span></div>
+            </div>
+          </div>
+          <footer class="panel-foot">
+            <button class="btn" id="gen-regen"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v6h-6"/></svg>Buat ulang</button>
+            <button class="btn primary" id="gen-copy"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></svg><span>Salin</span></button>
+          </footer>
+        </section>
+        <section class="card panel" aria-labelledby="p-gen-opt">
+          <header class="panel-head">
+            <span class="panel-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/></svg></span>
+            <div><h2 id="p-gen-opt">Jenis karakter</h2><p>Setiap jenis yang aktif dijamin muncul minimal sekali.</p></div>
+          </header>
+          <div class="panel-body">
+            <div class="opts" id="gen-opts"></div>
+            <p id="gen-err" class="err" role="alert"></p>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <!-- IMPOR & EKSPOR -->
+    <section class="view" id="v-transfer" hidden>
+      <header class="head"><div><h1>Impor &amp; Ekspor</h1><p class="muted">Pindahkan data masuk dan keluar dari vault.</p></div></header>
+      <div class="panels">
+        <section class="card panel" aria-labelledby="p-exp">
+          <header class="panel-head">
+            <span class="panel-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 15v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4"/></svg></span>
+            <div><h2 id="p-exp">Ekspor</h2><p>Pilih format file yang ingin diunduh.</p></div>
+          </header>
+          <div class="panel-body choice">
+            <button class="choice-btn" id="exp-enc"><b>Backup terenkripsi</b><small>.json · aman disimpan di cloud. Dibuka dengan master password.</small></button>
+            <button class="choice-btn" id="exp-json"><b>JSON tidak terenkripsi</b><small>.json · semua item &amp; folder, bisa dibaca siapa saja.</small></button>
+            <button class="choice-btn" id="exp-csv"><b>CSV (Login)</b><small>.csv · folder, name, url, username, password, note.</small></button>
+          </div>
+        </section>
+        <section class="card panel" aria-labelledby="p-imp">
+          <header class="panel-head">
+            <span class="panel-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V3"/><path d="m7 8 5-5 5 5"/><path d="M5 15v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4"/></svg></span>
+            <div><h2 id="p-imp">Impor</h2><p>Item hasil impor <b>digabung</b> ke vault; data yang ada tidak dihapus.</p></div>
+          </header>
+          <div class="panel-body">
+            <label class="drop" for="imp-file" id="drop">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V3"/><path d="m7 8 5-5 5 5"/><path d="M5 15v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4"/></svg>
+              <b>Pilih atau seret file ke sini</b>
+              <small class="muted">Backup Brankas (.json) atau CSV dari browser &amp; password manager lain</small>
+            </label>
+            <input id="imp-file" type="file" accept=".json,.csv,application/json,text/csv" hidden>
+            <p id="imp-result" class="small" role="status"></p>
+            <div id="legacy-wrap" class="stack" hidden>
+              <p class="muted small">Ditemukan vault lama (versi tanpa akun) di browser ini.</p>
+              <button class="btn" id="legacy-btn">Impor vault lama ke akun ini</button>
+            </div>
+          </div>
+        </section>
+      </div>
+    </section>
+
+    <!-- PENGGUNA (khusus admin) -->
+    <section class="view" id="v-users" hidden>
+      <header class="head">
+        <div class="grow-1"><h1>Pengguna</h1><p class="muted">Kelola siapa saja yang bisa memakai Brankas di server ini.</p></div>
+        <button class="btn primary" id="user-add"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="8" r="3.5"/><path d="M3 20c.8-3.6 3.6-5.5 7-5.5 1.4 0 2.7.3 3.8.9"/><path d="M19 14v6M16 17h6"/></svg>Tambah user</button>
+      </header>
+      <div class="panels">
+        <section class="card panel" aria-labelledby="p-users">
+          <header class="panel-head">
+            <span class="panel-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.6 3.4-5.5 6.5-5.5s5.7 1.9 6.5 5.5"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8"/><path d="M18.5 14.8c1.6.8 2.6 2.6 3 5.2"/></svg></span>
+            <div><h2 id="p-users">Akun</h2><p>Setiap user punya vault terenkripsi sendiri. Admin tidak bisa melihat isinya.</p></div>
+          </header>
+          <div class="panel-body" id="users-list"></div>
+        </section>
+        <section class="card panel" aria-labelledby="p-inv">
+          <header class="panel-head">
+            <span class="panel-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3.5 6.5 8.5 6 8.5-6"/></svg></span>
+            <div><h2 id="p-inv">Undangan aktif</h2><p>Link yang belum dipakai. Batalkan bila tidak jadi.</p></div>
+          </header>
+          <div class="panel-body" id="invites-list"></div>
+        </section>
+      </div>
+    </section>
+
+    <!-- SETTINGS -->
+    <section class="view" id="v-settings" hidden>
+      <header class="head"><div><h1>Pengaturan</h1><p class="muted">Akun, keamanan, dan master password.</p></div></header>
+      <div class="panels">
+        <section class="card panel" aria-labelledby="p-acc">
+          <header class="panel-head">
+            <span class="panel-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg></span>
+            <div><h2 id="p-acc">Akun</h2><p>Vault tersinkron ke server untuk semua perangkatmu.</p></div>
+          </header>
+          <div class="panel-body">
+            <div class="kv"><span class="label-up">Masuk sebagai</span><span class="mono kv-val" id="acc-name"></span></div>
+            <p class="muted small">Masuk dengan akun yang sama di HP atau laptop lain untuk mengakses data yang sama.</p>
+          </div>
+          <footer class="panel-foot">
+            <button class="btn" id="acc-lock" type="button">Kunci &amp; keluar</button>
+          </footer>
+        </section>
+        <section class="card panel" aria-labelledby="p-auto">
+          <header class="panel-head">
+            <span class="panel-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5"/><path d="M9 2h6"/></svg></span>
+            <div><h2 id="p-auto">Kunci otomatis</h2><p>Lindungi vault saat perangkat ditinggal.</p></div>
+          </header>
+          <div class="panel-body">
+            <label for="autolock" class="small">Kunci vault setelah tidak aktif</label>
+            <select id="autolock" class="input">
+              <option value="1">1 menit</option><option value="5">5 menit</option><option value="15">15 menit</option><option value="60">60 menit</option>
+            </select>
+            <label class="check"><input type="checkbox" id="clipclear"> Hapus clipboard 30 detik setelah menyalin</label>
+          </div>
+        </section>
+        <form class="card panel" id="chg-form" aria-labelledby="p-chg">
+          <header class="panel-head">
+            <span class="panel-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="7.5" cy="14.5" r="3.5"/><path d="M10 12 20 2"/><path d="m16 6 3 3"/><path d="m14 8 2 2"/></svg></span>
+            <div><h2 id="p-chg">Ganti master password</h2><p>Vault dienkripsi ulang; perangkat lain akan dikeluarkan.</p></div>
+          </header>
+          <div class="panel-body">
+            <label for="chg-old" class="small">Master password lama</label><input id="chg-old" type="password" class="input mono" required autocomplete="current-password">
+            <label for="chg-new" class="small">Master password baru (min. 10)</label><input id="chg-new" type="password" class="input mono" required minlength="10" autocomplete="new-password">
+            <p id="chg-err" class="err" role="alert"></p>
+          </div>
+          <footer class="panel-foot">
+            <button class="btn primary" type="submit">Simpan master password</button>
+          </footer>
+        </form>
+        <section class="card panel danger-zone" aria-labelledby="p-del">
+          <header class="panel-head">
+            <span class="panel-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M19 6l-1 14H6L5 6"/></svg></span>
+            <div><h2 id="p-del">Hapus akun</h2><p>Menghapus akun beserta seluruh isi vault dari server.</p></div>
+          </header>
+          <div class="panel-body">
+            <p class="muted small">Tindakan ini tidak bisa dibatalkan. Ekspor backup terenkripsi dulu bila datanya masih diperlukan.</p>
+          </div>
+          <footer class="panel-foot">
+            <button class="btn danger" id="del-acc" type="button">Hapus akun</button>
+          </footer>
+        </section>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- ============ JENDELA DETAIL ITEM ============ -->
+<dialog id="view-dlg" class="view-dlg" aria-labelledby="view-title"><div id="view-body"></div></dialog>
+
+<!-- ============ MODAL ============ -->
+<dialog id="modal">
+  <form id="modal-form" method="dialog" class="stack" autocomplete="off">
+    <h2 id="modal-title"></h2>
+    <div id="modal-body" class="stack"></div>
+    <p id="modal-err" class="err" role="alert"></p>
+    <div class="row-end">
+      <button type="button" class="btn" id="modal-cancel">Batal</button>
+      <button type="submit" class="btn primary" id="modal-ok">Simpan</button>
+    </div>
+  </form>
+</dialog>
+
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script src="app.js?v=21"></script>
+</body>
+</html>

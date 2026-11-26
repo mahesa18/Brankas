@@ -1,0 +1,30 @@
+# /etc/systemd/system/brankas.service
+[Unit]
+Description=Brankas password manager
+After=network.target
+
+[Service]
+Type=simple
+User=brankas
+Group=brankas
+WorkingDirectory=/opt/brankas
+EnvironmentFile=/opt/brankas/.env
+Environment=NODE_ENV=production
+ExecStart=/usr/bin/node server/server.js
+Restart=on-failure
+RestartSec=3
+
+# Pengerasan
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/brankas/data
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+LockPersonality=true
+
+[Install]
+WantedBy=multi-user.target

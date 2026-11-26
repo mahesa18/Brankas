@@ -1,0 +1,11 @@
+# /etc/systemd/system/brankas-backup.timer — setiap tanggal 1, pukul 02.30 WIB
+[Unit]
+Description=Backup bulanan database Brankas
+
+[Timer]
+OnCalendar=*-*-01 02:30:00 Asia/Jakarta
+Persistent=true
+RandomizedDelaySec=10min
+
+[Install]
+WantedBy=timers.target

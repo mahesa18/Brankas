@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kebijakan Privasi — Brankas</title>
+<meta name="referrer" content="no-referrer">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<style>
+  :root{--bg:#0F1115;--surface:#171A21;--line:#262B35;--text:#E8EAF0;--text2:#C9CFD8;--muted:#9AA3B2;--accent:#8BE9B4}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text2);font:16px/1.7 Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
+  main{max-width:760px;margin:0 auto;padding:48px 20px 72px}
+  header{display:flex;align-items:center;gap:14px;margin-bottom:28px}
+  header img{width:48px;height:48px}
+  h1{margin:0;color:var(--text);font-size:30px;line-height:1.2;letter-spacing:-.02em}
+  h2{margin:32px 0 8px;color:var(--text);font-size:19px}
+  p,li{margin:0 0 10px}
+  ul{padding-left:22px;margin:0 0 10px}
+  .muted{color:var(--muted);font-size:14px}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin:18px 0}
+  a{color:var(--accent)}
+  code{font-family:"JetBrains Mono",ui-monospace,Consolas,monospace;font-size:14px;color:var(--text)}
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <img src="logo.svg" alt="">
+    <div>
+      <h1>Kebijakan Privasi Brankas</h1>
+      <p class="muted">Berlaku sejak 27 November 2026</p>
+    </div>
+  </header>
+
+  <p>Brankas adalah password manager <em>self-hosted</em> di <a href="https://brankas.site">brankas.site</a> yang dijalankan oleh pemilik servernya sendiri. Halaman ini menjelaskan data apa yang disimpan, bagaimana data itu dilindungi, dan bagaimana integrasi Google Drive dipakai.</p>
+
+  <div class="card">
+    <strong style="color:var(--text)">Ringkasnya:</strong> isi vault dienkripsi di perangkatmu sebelum dikirim ke server. Server, admin, maupun pihak lain tidak bisa membaca password, catatan, kunci, atau lampiranmu. Tidak ada iklan, pelacakan, atau penjualan data.
+  </div>
+
+  <h2>1. Data yang disimpan</h2>
+  <ul>
+    <li><strong>Username</strong> yang kamu pilih saat mendaftar.</li>
+    <li><strong>Vault terenkripsi</strong> berisi item (login, kartu, identitas, catatan, SSH key, API key, folder). Dienkripsi AES-256-GCM dengan kunci yang diturunkan dari master password di browser.</li>
+    <li><strong>Lampiran terenkripsi</strong>. Setiap file dienkripsi di browser dengan kunci acak sendiri; server hanya mengetahui ukurannya.</li>
+    <li><strong>Data verifikasi login</strong>: salt dan hash scrypt dari kunci autentikasi. Master password tidak pernah dikirim maupun disimpan.</li>
+    <li><strong>Data sesi</strong>: hash token sesi, waktu login, alamat IP, dan jenis browser, untuk keamanan dan pembatasan percobaan login.</li>
+  </ul>
+
+  <h2>2. Penggunaan data</h2>
+  <p>Data hanya dipakai untuk menjalankan layanan: masuk ke akun, menyimpan dan menyinkronkan vault antar perangkatmu, serta melindungi akun dari penyalahgunaan. Data tidak dibagikan, dijual, atau dipakai untuk iklan.</p>
+
+  <h2>3. Integrasi Google Drive (Brankas Backup)</h2>
+  <p>Pemilik server memakai aplikasi Google <strong>"Brankas Backup"</strong> untuk menyimpan salinan cadangan database server ke Google Drive <strong>milik pemilik server sendiri</strong>.</p>
+  <ul>
+    <li>Izin yang diminta hanya <code>https://www.googleapis.com/auth/drive.file</code>: akses ke file yang dibuat oleh aplikasi ini saja. Aplikasi <strong>tidak dapat melihat, membaca, atau mengubah</strong> file lain di Google Drive.</li>
+    <li>Yang diunggah hanyalah file backup database Brankas yang isinya sudah terenkripsi.</li>
+    <li>Data dari Google tidak dibagikan ke pihak ketiga, tidak dipakai untuk iklan, dan tidak dipakai untuk melatih model AI/ML. Penggunaan data yang diterima dari Google API mematuhi <a href="https://developers.google.com/terms/api-services-user-data-policy" rel="noopener noreferrer">Google API Services User Data Policy</a>, termasuk ketentuan <em>Limited Use</em>.</li>
+    <li>Akses dapat dicabut kapan saja di <a href="https://myaccount.google.com/permissions" rel="noopener noreferrer">myaccount.google.com/permissions</a>.</li>
+  </ul>
+
+  <h2>4. Layanan pihak ketiga</h2>
+  <ul>
+    <li><strong>Cloudflare Turnstile</strong> memverifikasi bahwa yang masuk atau mendaftar adalah manusia. Lihat <a href="https://www.cloudflare.com/privacypolicy/" rel="noopener noreferrer">kebijakan privasi Cloudflare</a>.</li>
+    <li><strong>Google Fonts</strong> memuat huruf tampilan aplikasi.</li>
+  </ul>
+
+  <h2>5. Penyimpanan &amp; penghapusan</h2>
+  <p>Data disimpan di server milik pemilik Brankas selama akun aktif. Kamu dapat menghapus akun beserta seluruh isi vault dan lampiran kapan saja melalui <strong>Pengaturan → Hapus akun</strong>. Salinan cadangan terenkripsi dihapus otomatis sesuai masa simpannya (±6 bulan di server, ±12 bulan di Google Drive).</p>
+
+  <h2>6. Keamanan</h2>
+  <p>Koneksi selalu melalui HTTPS. Karena enkripsi end-to-end, <strong>master password tidak dapat direset</strong>: bila lupa, isi vault tidak dapat dipulihkan oleh siapa pun.</p>
+
+  <h2>7. Kontak</h2>
+  <p>Pertanyaan tentang privasi atau penghapusan data dapat disampaikan kepada admin server Brankas yang mengundangmu.</p>
+
+  <p class="muted" style="margin-top:36px"><a href="/">← Kembali ke Brankas</a></p>
+</main>
+</body>
+</html>

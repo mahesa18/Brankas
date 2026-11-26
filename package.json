@@ -1,0 +1,24 @@
+{
+  "name": "brankas-password-manager",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Password manager self-hosted: akun + vault terenkripsi end-to-end (zero-knowledge).",
+  "main": "server/server.js",
+  "type": "commonjs",
+  "engines": {
+    "node": ">=20.12"
+  },
+  "scripts": {
+    "start": "node server/server.js",
+    "dev": "node --watch server/server.js",
+    "list-users": "node server/cli.js list-users",
+    "delete-user": "node server/cli.js delete-user"
+  },
+  "dependencies": {
+    "better-sqlite3": "^12.2.0",
+    "express": "^5.1.0"
+  },
+  "allowScripts": {
+    "better-sqlite3@12.11.1": true
+  }
+}

@@ -1,0 +1,43 @@
+# Brankas — terisolasi dari app lain:
+#  - project & jaringan Docker sendiri ("brankas")
+#  - hanya membuka port di 127.0.0.1 (diakses lewat reverse proxy, tidak langsung dari internet)
+#  - filesystem read-only, tanpa capability Linux, data di ./data
+name: brankas
+
+services:
+  brankas:
+    build: .
+    image: brankas:latest
+    container_name: brankas
+    restart: unless-stopped
+    # jalan sebagai user host khusus "brankas" (bukan UID 1000 yang bisa dipakai app lain)
+    user: "${BRANKAS_UID:-10001}:${BRANKAS_GID:-10001}"
+    env_file: .env
+    environment:
+      HOST: 0.0.0.0
+      PORT: "3000"
+      DB_PATH: /data/brankas.db
+      TRUST_PROXY: loopback,uniquelocal
+    volumes:
+      - ./data:/data
+    ports:
+      - "127.0.0.1:${BRANKAS_PORT:-3100}:3000"
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    mem_limit: 512m
+    networks:
+      - brankas
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  brankas:
+    name: brankas

@@ -1,0 +1,25 @@
+# Brankas password manager — container Docker "brankas" di 127.0.0.1:3100
+# Header keamanan (CSP, HSTS, dll.) dikirim oleh aplikasinya sendiri.
+brankas.site {
+	encode zstd gzip
+	request_body {
+		max_size 30MB
+	}
+	# sembunyikan identitas web server (diterapkan saat respons dikirim)
+	header {
+		-Server
+		-Via
+		defer
+	}
+	reverse_proxy 127.0.0.1:3100
+}
+
+# alamat lain dialihkan ke domain utama
+www.brankas.site, brankas.cereauto.net {
+	header {
+		-Server
+		-Via
+		defer
+	}
+	redir https://brankas.site{uri} permanent
+}

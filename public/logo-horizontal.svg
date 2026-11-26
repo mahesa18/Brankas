@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 64" role="img" aria-label="Brankas">
+  <rect width="64" height="64" rx="16" fill="#8BE9B4"/>
+  <g fill="none" stroke="#0F1115" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="13" y="11" width="38" height="36" rx="8"/>
+    <circle cx="32" cy="29" r="8.5"/>
+    <path d="M32 29l5-5"/>
+    <path d="M21 47v5M43 47v5"/>
+  </g>
+  <text x="82" y="44" fill="#E8EAF0" font-family="'Space Grotesk', Inter, system-ui, sans-serif" font-size="36" font-weight="700" letter-spacing="-0.5">Brankas</text>
+</svg>

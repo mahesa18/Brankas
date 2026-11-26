@@ -1,0 +1,11 @@
+# /etc/systemd/system/brankas-backup.service
+[Unit]
+Description=Backup database Brankas
+Requires=docker.service
+After=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/bin/sh /opt/brankas/deploy/backup.sh
+Nice=10
+IOSchedulingClass=idle
