@@ -10,7 +10,7 @@
 <meta name="theme-color" content="#0F1115">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css?v=22">
+<link rel="stylesheet" href="style.css?v=23">
 </head>
 <body>
 
@@ -81,19 +81,23 @@
   <main class="main">
     <!-- ITEMS (semua jenis) -->
     <section class="view" id="v-items" hidden>
-      <header class="head">
-        <div class="grow-1">
+      <header class="head head-stack">
+        <div class="head-title">
           <h1 id="items-title">Semua item</h1>
           <p class="muted" id="items-sub">Terenkripsi AES-256 di perangkat ini. Hanya kamu yang memegang kuncinya.</p>
         </div>
-        <label class="search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><span class="sr">Cari item</span><input id="search" type="search" placeholder="Cari…"></label>
-        <div id="folder-acts" class="row-wrap" hidden>
-          <button class="btn" id="folder-rename">Ganti nama</button>
-          <button class="btn danger" id="folder-del">Hapus folder</button>
-        </div>
-        <div class="menu-wrap">
-          <button class="btn primary" id="add-btn" aria-haspopup="menu" aria-expanded="false" aria-controls="add-menu"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Tambah</button>
-          <div class="menu" id="add-menu" role="menu" aria-labelledby="add-btn" hidden></div>
+        <div class="toolbar">
+          <label class="search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><span class="sr">Cari item</span><input id="search" type="search" placeholder="Cari…"></label>
+          <div class="toolbar-actions">
+            <div id="folder-acts" class="row-wrap" hidden>
+              <button class="btn" id="folder-rename">Ganti nama</button>
+              <button class="btn danger" id="folder-del">Hapus folder</button>
+            </div>
+            <div class="menu-wrap">
+              <button class="btn primary" id="add-btn" aria-haspopup="menu" aria-expanded="false" aria-controls="add-menu"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Tambah</button>
+              <div class="menu" id="add-menu" role="menu" aria-labelledby="add-btn" hidden></div>
+            </div>
+          </div>
         </div>
       </header>
       <section class="item-grid" id="list" aria-label="Daftar item"></section>
@@ -174,9 +178,13 @@
 
     <!-- PENGGUNA (khusus admin) -->
     <section class="view" id="v-users" hidden>
-      <header class="head">
-        <div class="grow-1"><h1>Pengguna</h1><p class="muted">Kelola siapa saja yang bisa memakai Brankas di server ini.</p></div>
+      <header class="head head-stack">
+        <div class="head-title"><h1>Pengguna</h1><p class="muted">Kelola siapa saja yang bisa memakai Brankas di server ini.</p></div>
+        <div class="toolbar">
+          <div class="toolbar-actions">
         <button class="btn primary" id="user-add"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10" cy="8" r="3.5"/><path d="M3 20c.8-3.6 3.6-5.5 7-5.5 1.4 0 2.7.3 3.8.9"/><path d="M19 14v6M16 17h6"/></svg>Tambah user</button>
+          </div>
+        </div>
       </header>
       <div class="panels">
         <section class="card panel" aria-labelledby="p-users">
@@ -275,6 +283,6 @@
 
 <div id="toast" role="status" aria-live="polite"></div>
 
-<script src="app.js?v=22"></script>
+<script src="app.js?v=23"></script>
 </body>
 </html>

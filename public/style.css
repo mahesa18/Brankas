@@ -477,3 +477,27 @@ textarea:-webkit-autofill,select:-webkit-autofill{
 /* ---- Cloudflare Turnstile ---- */
 .ts-box{min-height:65px;display:flex;justify-content:center}
 .ts-box iframe{max-width:100%}
+
+/* ---- kepala halaman: judul di atas, Cari & Tambah di baris bawahnya ---- */
+.head.head-stack{flex-direction:column;flex-wrap:nowrap;align-items:stretch;gap:16px}
+.head-title{min-width:0}
+.head-title p{margin-top:4px;font-size:14px}
+.toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:12px}
+.toolbar .search{flex:1 1 320px;max-width:520px;min-width:0}
+.toolbar-actions{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-left:auto}
+.toolbar-actions:only-child{margin-left:0}
+@media (max-width:860px){
+  .head.head-stack{gap:12px}
+  .toolbar{gap:10px}
+  .toolbar .search{flex:1 1 180px;max-width:none}
+  .toolbar-actions{gap:8px}
+}
+@media (max-width:860px){
+  /* HP: Cari + Tambah sebaris, tombol folder di baris sendiri dengan lebar sama */
+  .toolbar{flex-wrap:wrap}
+  .toolbar-actions{display:contents}
+  .toolbar .search{order:1;flex:1 1 0}
+  .toolbar .menu-wrap,.toolbar #user-add{order:2}
+  .toolbar #folder-acts{order:3;flex:1 1 100%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .toolbar #folder-acts .btn{width:100%}
+}
