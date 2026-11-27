@@ -640,6 +640,7 @@
     itemMenu.replaceChildren(
       act('star', it.fav ? 'Hapus dari favorit' : 'Favorit', () => { it.fav = !it.fav; save(it.fav ? 'Ditambahkan ke favorit' : 'Dihapus dari favorit'); }),
       act('edit', 'Edit', () => editItem(it)),
+      act('folder', 'Pindah ke folder', () => moveToFolder([it])),
       act('clip', 'Lampiran', () => { openView(it); viewDlg.querySelector('.vd-att')?.scrollIntoView({ block: 'center' }); }),
       act('copy', 'Duplikat', async () => {
         const t = Date.now();
@@ -756,6 +757,7 @@
     const bulk = selected.size ? h('div', { class: 'bulk' },
       h('span', {}, `${selected.size} dipilih`),
       h('button', { type: 'button', class: 'btn', onclick: () => bulkAct('fav') }, icon('star'), 'Favorit'),
+      h('button', { type: 'button', class: 'btn', onclick: () => moveToFolder(data.items.filter((i) => selected.has(i.id))) }, icon('folder'), 'Pindah folder'),
       h('button', { type: 'button', class: 'btn', onclick: () => bulkAct('archive') }, icon('archive'), 'Arsipkan'),
       h('button', { type: 'button', class: 'btn danger', onclick: () => bulkAct('delete') }, icon('trash'), 'Hapus'),
       h('button', { type: 'button', class: 'btn', onclick: () => { selected.clear(); renderItems(); } }, 'Batal')) : null;
@@ -784,6 +786,37 @@
       }) : h('p', { class: 'empty' }, 'Tidak ada item yang cocok dengan pencarian.'));
 
     list.replaceChildren(...[dash, h('h2', { class: 'list-title' }, 'Semua item'), bulk, table].filter(Boolean));
+  }
+
+  // ---------- pindah item ke folder (satu / banyak) ----------
+  function moveToFolder(its) {
+    if (!its.length) return;
+    const cur = its.length === 1 ? (its[0].folder || '') : (its.every((i) => i.folder === its[0].folder) ? (its[0].folder || '') : '');
+    const folders = [...data.folders].sort((a, b) => a.name.localeCompare(b.name));
+    openModal({
+      title: its.length === 1 ? `Pindahkan “${its[0].name || 'item'}”` : `Pindahkan ${its.length} item`,
+      okLabel: 'Pindahkan',
+      fields: [
+        { k: 'folder', label: 'Folder tujuan', type: 'select', options: [['', 'Tanpa folder'], ...folders.map((f) => [f.id, f.name])], value: cur },
+        { k: 'newname', label: 'Atau buat folder baru', placeholder: 'mis. Kerja (kosongkan bila memilih di atas)' },
+      ],
+      async onSave(v) {
+        let target = v.folder || null;
+        const nm = (v.newname || '').trim();
+        if (nm) {
+          if (nm.length > 60) throw new Error('Nama folder maksimal 60 karakter.');
+          let f = data.folders.find((x) => x.name.toLowerCase() === nm.toLowerCase());
+          if (!f) { f = { id: uid(), name: nm }; data.folders.push(f); }
+          target = f.id;
+        }
+        const t = Date.now();
+        its.forEach((i) => { i.folder = target; i.updated = t; });
+        selected.clear();
+        render();
+        await persist();
+        toast(`${its.length} item dipindahkan ke ${target ? `folder “${folderName(target)}”` : '“Tanpa folder”'}`);
+      },
+    });
   }
 
   async function bulkAct(kind) {
